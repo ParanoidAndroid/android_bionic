@@ -445,7 +445,8 @@ libc_common_src_files += \
    	arch-arm/bionic/armv7/bzero.S 
 else 
 libc_common_src_files += \
-	arch-arm/bionic/memcpy.S 
+	arch-arm/bionic/memcpy.S \
+    arch-arm/bionic/armv7/bzero.S 
 endif
 #We can only use linaro optimizations on Arm-v7a
 ifeq ($(TARGET_USE_LINARO_STRING_ROUTINES)-$(ARCH_ARM_HAVE_ARMV7A),true-true)
