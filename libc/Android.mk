@@ -439,7 +439,11 @@ libc_arch_static_src_files := \
 libc_arch_dynamic_src_files := \
 	arch-arm/bionic/exidx_dynamic.c
 
-ifeq ($(ARCH_ARM_HAVE_ARMV7A),true)
+# linaro optimized string routines are opt-in	
+TARGET_USE_LINARO_STRING_ROUTINES ?= false
+	
+#We can only use linaro optimizations on Arm-v7a
+ifeq ($(TARGET_USE_LINARO_STRING_ROUTINES)-$(ARCH_ARM_HAVE_ARMV7A),true-true)
 libc_common_src_files += \
 	arch-arm/bionic/armv7/memchr.S \
 	arch-arm/bionic/armv7/memcpy.S \
