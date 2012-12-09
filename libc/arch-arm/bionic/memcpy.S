@@ -429,9 +429,11 @@ memcpy:
 #ifdef HAVE_32_BYTE_CACHE_LINE
 /* a prefetch distance of 2 cache-lines */
 #define CACHE_LINE_SIZE     32
+#define PREFETCH_DISTANCE   (CACHE_LINE_SIZE*2)
 #else
 /* a prefetch distance of 4 cache-lines works best experimentally */
 #define CACHE_LINE_SIZE     64
+#define PREFETCH_DISTANCE   (CACHE_LINE_SIZE*4)
 #endif
 
 ENTRY(memcpy)
