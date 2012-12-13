@@ -29,29 +29,17 @@
  */
 
 #include <string.h>
-#include <private/logd.h>
 
 char *
-__strrchr_chk(const char *p, int ch, size_t s_len)
+strrchr(const char *p, int ch)
 {
 	char *save;
 
-	for (save = NULL;; ++p, s_len--) {
-		if (s_len == 0) {
-			__libc_android_log_print(ANDROID_LOG_FATAL, "libc",
-				"*** FORTIFY_SOURCE strrchr read beyond buffer ***\n");
-			abort();
-		}
+	for (save = NULL;; ++p) {
 		if (*p == (char) ch)
 			save = (char *)p;
 		if (!*p)
 			return(save);
 	}
 	/* NOTREACHED */
-}
-
-char *
-strrchr(const char *p, int ch)
-{
-	return __strrchr_chk(p, ch, (size_t) -1);
 }

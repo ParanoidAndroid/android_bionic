@@ -29,7 +29,6 @@
 #define _ANDROID_BIONIC_LOGD_H
 
 #include <stdarg.h>
-#include <stdint.h>
 
 #define BIONIC_EVENT_MEMCPY_BUFFER_OVERFLOW 80100
 #define BIONIC_EVENT_STRCAT_BUFFER_OVERFLOW 80105
