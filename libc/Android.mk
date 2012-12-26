@@ -452,7 +452,6 @@ ifeq ($(TARGET_USE_LINARO_STRING_ROUTINES)-$(ARCH_ARM_HAVE_ARMV7A),true-true)
 libc_common_src_files += \
 	arch-arm/bionic/armv7/memchr.S \
 	arch-arm/bionic/armv7/memset.S \
-
 	arch-arm/bionic/armv7/strchr.S \
 	arch-arm/bionic/armv7/strcpy.c \
 	arch-arm/bionic/armv7/strlen.S
