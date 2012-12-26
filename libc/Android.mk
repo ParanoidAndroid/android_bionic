@@ -441,7 +441,8 @@ TARGET_USE_LINARO_MEMCPY ?= false
 #MemCPY breaks camera on gnex //TODO debug
 ifeq ($(TARGET_USE_LINARO_MEMCPY)-$(ARCH_ARM_HAVE_ARMV7A),true-true)
 libc_common_src_files += \
-	arch-arm/bionic/armv7/memcpy.S 
+	arch-arm/bionic/armv7/memcpy.S  \
+   	arch-arm/bionic/armv7/bzero.S 
 else 
 libc_common_src_files += \
 	arch-arm/bionic/memcpy.S 
@@ -451,7 +452,7 @@ ifeq ($(TARGET_USE_LINARO_STRING_ROUTINES)-$(ARCH_ARM_HAVE_ARMV7A),true-true)
 libc_common_src_files += \
 	arch-arm/bionic/armv7/memchr.S \
 	arch-arm/bionic/armv7/memset.S \
-	arch-arm/bionic/armv7/bzero.S \
+
 	arch-arm/bionic/armv7/strchr.S \
 	arch-arm/bionic/armv7/strcpy.c \
 	arch-arm/bionic/armv7/strlen.S
@@ -462,6 +463,10 @@ libc_common_src_files += \
 	string/strchr.c \
 	arch-arm/bionic/strcpy.S \
 	arch-arm/bionic/strlen.c.arm
+endif
+
+ifeq ($(ARCH_ARM_HAVE_ARMV7A),true)	
+    libc_common_cflags += -DNEON_UNALIGNED_ACCESS -DNEON_MEMCPY_ALIGNMENT_DIVIDER=224	
 endif
 
 else # arm
