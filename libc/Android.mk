@@ -377,6 +377,7 @@ libc_common_src_files += \
 	arch-arm/bionic/tgkill.S \
 	arch-arm/bionic/memcmp.S \
 	arch-arm/bionic/memcmp16.S \
+	arch-arm/bionic/memset.S \
 	arch-arm/bionic/setjmp.S \
 	arch-arm/bionic/sigsetjmp.S \
 	arch-arm/bionic/strcmp.S \
@@ -436,16 +437,14 @@ libc_arch_dynamic_src_files := \
 
 # linaro optimized string routines are opt-in	
 TARGET_USE_LINARO_STRING_ROUTINES ?= false
-TARGET_USE_LINARO_MEMCPY ?= false
 
-#MemCPY breaks camera on gnex //TODO debug
-ifeq ($(TARGET_USE_LINARO_MEMCPY)-$(ARCH_ARM_HAVE_ARMV7A),true-true)
-libc_common_src_files += \
-	arch-arm/bionic/armv7/memcpy.S  
-else 
-libc_common_src_files += \
-	arch-arm/bionic/memcpy.S 
+# We have a special memcpy for A15 currently
+ifeq ($(TARGET_ARCH_VARIANT_CPU),cortex-a15)
+libc_common_src_files += arch-arm/bionic/memcpy-a15.S
+else
+libc_common_src_files += arch-arm/bionic/memcpy.S
 endif
+
 #We can only use linaro optimizations on Arm-v7a
 ifeq ($(TARGET_USE_LINARO_STRING_ROUTINES)-$(ARCH_ARM_HAVE_ARMV7A),true-true)
 libc_common_src_files += \
