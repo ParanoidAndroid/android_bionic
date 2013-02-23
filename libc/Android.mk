@@ -277,6 +277,7 @@ libc_common_src_files := \
 	bionic/libc_init_common.c \
 	bionic/logd_write.c \
 	bionic/md5.c \
+	bionic/memmove_words.c \
 	bionic/pututline.c \
 	bionic/realpath.c \
 	bionic/sched_getaffinity.c \
@@ -384,23 +385,24 @@ libc_common_src_files += \
 	string/strncmp.c \
 	unistd/socketcalls.c
 
+
+# We have a special memcpy for A15 currently
+ifeq ($(TARGET_ARCH_VARIANT_CPU),cortex-a15)
+libc_common_src_files += arch-arm/bionic/memcpy-a15.S
+else
+libc_common_src_files += arch-arm/bionic/memcpy.S
+endif
+
 # Check if we want a neonized version of memmove instead of the
 # current ARM version
-ifeq ($(TARGET_USE_SCORPION_BIONIC_OPTIMIZATION),true)
-libc_common_src_files += \
-	arch-arm/bionic/memmove.S \
-	bionic/memmove_words.c
-else
-ifneq (, $(filter true,$(TARGET_USE_KRAIT_BIONIC_OPTIMIZATION) $(TARGET_USE_SPARROW_BIONIC_OPTIMIZATION)))
+ifeq ($(ARCH_ARM_HAVE_NEON),true)
  libc_common_src_files += \
 	arch-arm/bionic/memmove.S
  else # Other ARM
  libc_common_src_files += \
 	string/bcopy.c \
-	string/memmove.c.arm \
-	bionic/memmove_words.c
- endif # !TARGET_USE_KRAIT_BIONIC_OPTIMIZATION
-endif # !TARGET_USE_SCORPION_BIONIC_OPTIMIZATION
+	string/memmove.c.arm
+endif # ARCH_ARM_HAVE_NEON
 
 # If the kernel supports kernel user helpers for gettimeofday, use
 # that instead.
@@ -436,16 +438,14 @@ libc_arch_dynamic_src_files := \
 
 # linaro optimized string routines are opt-in	
 TARGET_USE_LINARO_STRING_ROUTINES ?= false
-TARGET_USE_LINARO_MEMCPY ?= false
 
-#MemCPY breaks camera on gnex //TODO debug
-ifeq ($(TARGET_USE_LINARO_MEMCPY)-$(ARCH_ARM_HAVE_ARMV7A),true-true)
-libc_common_src_files += \
-	arch-arm/bionic/armv7/memcpy.S  
-else 
-libc_common_src_files += \
-	arch-arm/bionic/memcpy.S 
+# We have a special memcpy for A15 currently
+ifeq ($(TARGET_ARCH_VARIANT_CPU),cortex-a15)
+libc_common_src_files += arch-arm/bionic/memcpy-a15.S
+else
+libc_common_src_files += arch-arm/bionic/memcpy.S
 endif
+
 #We can only use linaro optimizations on Arm-v7a
 ifeq ($(TARGET_USE_LINARO_STRING_ROUTINES)-$(ARCH_ARM_HAVE_ARMV7A),true-true)
 libc_common_src_files += \
@@ -617,6 +617,17 @@ ifeq ($(TARGET_ARCH),arm)
   endif
   ifeq ($(ARCH_ARM_USE_NON_NEON_MEMCPY),true)
     libc_common_cflags += -DARCH_ARM_USE_NON_NEON_MEMCPY
+  endif
+
+
+  ifeq ($(ARCH_ARM_HAVE_NEON_UNALIGNED_ACCESS),true)
+    libc_common_cflags += -DNEON_UNALIGNED_ACCESS
+  endif
+  ifneq ($(ARCH_ARM_NEON_MEMCPY_ALIGNMENT_DIVIDER),)
+    libc_common_cflags += -DNEON_MEMCPY_ALIGNMENT_DIVIDER=$(ARCH_ARM_NEON_MEMCPY_ALIGNMENT_DIVIDER)
+  endif
+  ifneq ($(ARCH_ARM_NEON_MEMSET_DIVIDER),)
+    libc_common_cflags += -DNEON_MEMSET_DIVIDER=$(ARCH_ARM_NEON_MEMSET_DIVIDER)
   endif
 
   # Add in defines to activate SCORPION_NEON_OPTIMIZATION
