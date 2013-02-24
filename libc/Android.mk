@@ -385,14 +385,6 @@ libc_common_src_files += \
 	string/strncmp.c \
 	unistd/socketcalls.c
 
-
-# We have a special memcpy for A15 currently
-ifeq ($(TARGET_ARCH_VARIANT_CPU),cortex-a15)
-libc_common_src_files += arch-arm/bionic/memcpy-a15.S
-else
-libc_common_src_files += arch-arm/bionic/memcpy.S
-endif
-
 # Check if we want a neonized version of memmove instead of the
 # current ARM version
 ifeq ($(ARCH_ARM_HAVE_NEON),true)
