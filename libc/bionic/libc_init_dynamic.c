@@ -79,9 +79,10 @@ void __libc_preinit(void)
     /* Setup pthread routines accordingly to the environment.
      * Requires system properties
      */
+#ifdef PTHREAD_DEBUG
     extern void pthread_debug_init(void);
     pthread_debug_init();
-
+#endif
     /* Setup malloc routines accordingly to the environment.
      * Requires system properties
      */
